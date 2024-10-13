@@ -1,0 +1,16 @@
+{% extends "admin/change_form.html" %}
+{% load static %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+    <script src="{% static 'js/jquery.js' %}"></script>
+    <script src="{% static 'js/update_owner_fields.js' %}"></script>
+    <script>
+        var getUnitaOrganizzativeUrl = "{% url 'normativa:get_unita_organizzative' %}?legal_entity_id=LEGAL_ENTITY_ID";
+    </script>
+{% endblock %}
+
+{% block content %}
+    {{ block.super }}
+{% endblock %}

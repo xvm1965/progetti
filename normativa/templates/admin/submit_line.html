@@ -1,0 +1,78 @@
+{% load i18n admin_urls %}
+<div class="submit-row">
+    {% block submit-row %}
+    {% if show_save %}<input type="submit" value="{% translate 'Save' %}" class="default" name="_save">{% endif %}
+    {% if show_save_as_new %}<input type="submit" value="{% translate 'Save as new' %}" name="_saveasnew">{% endif %}
+    {% if show_save_and_continue %}<input type="submit" value="{% if can_change %}{% translate 'Save and continue editing' %}{% else %}{% translate 'Save and view' %}{% endif %}" name="_continue">{% endif %}
+    {% if show_close %}
+        {% url opts|admin_urlname:'changelist' as changelist_url %}
+        <a href="{% add_preserved_filters changelist_url %}" class="closelink">{% translate 'Close' %}</a>
+    {% endif %}
+    
+    {% if opts.model_name == 'documenti' %}
+        <!-- <input type="button" value="Addestra" id="train-model-btn" class="default" name="_train"> -->
+    {% endif %}
+    {% if opts.model_name == 'domande' %}
+        <input type="button" value="Risposta" id="answer-btn" class="default" name="_answer">
+    {% endif %}
+   
+    {% if show_delete_link and original %}
+        {% url opts|admin_urlname:'delete' original.pk|admin_urlquote as delete_url %}
+        <a href="{% add_preserved_filters delete_url %}" class="deletelink">{% translate "Delete" %}</a>
+    {% endif %}
+    {% endblock %}
+</div>
+
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('answer-btn').addEventListener('click', function() {
+            // Cerca un elemento con name="domanda" (assumendo che il campo si chiami così)
+            const questionElement = document.querySelector('[name="domanda"]');
+            if (!questionElement) {
+                alert('Elemento domanda non trovato.');
+                return;
+            }
+
+            const question = questionElement.value.trim();
+            console.log('Valore del campo domanda:', question); // Aggiungi questa riga
+            if (!question) {
+                alert(' submit line Il campo domanda è vuoto.');
+                return;
+            }
+
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            const requestBody = JSON.stringify({
+                'question': question
+            });
+
+            console.log('Corpo della richiesta:', requestBody); // Aggiungi questa riga
+
+            fetch("{% url 'normativa:generate_answer_view' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: requestBody
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Errore HTTP: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === 'success') {
+                    alert(`Risposta: ${data.answer}`);
+                } else {
+                    alert(`Errore: ${data.message}`);
+                }
+            })
+            .catch(error => {
+                console.error('Errore:', error);
+                alert('Si è verificato un errore durante la generazione della risposta.');
+            });
+        });
+    });
+</script>

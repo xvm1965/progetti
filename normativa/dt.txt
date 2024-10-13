@@ -1,0 +1,42 @@
+ Il volume nell'unit… C non ha etichetta.
+ Numero di serie del volume: E8C0-7979
+
+ Directory di C:\Users\Asus\Desktop\vprj\flowe\normativa\templates
+
+16/07/2024  07:51    <DIR>          .
+16/07/2024  07:51    <DIR>          ..
+09/08/2024  10:53    <DIR>          admin
+16/07/2024  07:51    <DIR>          normativa
+               0 File              0 byte
+
+ Directory di C:\Users\Asus\Desktop\vprj\flowe\normativa\templates\admin
+
+09/08/2024  10:53    <DIR>          .
+09/08/2024  10:53    <DIR>          ..
+09/08/2024  08:16             1.409 chat_window.html
+04/07/2024  11:05             3.020 documenti_changelist.html
+22/07/2024  17:55               873 documenti_change_form.html
+09/08/2024  10:54    <DIR>          domande
+22/07/2024  17:54             4.434 ex documenti_change_form.html
+01/07/2024  11:03               544 processi_change_form.html
+29/07/2024  14:37             3.356 submit_line.html
+               6 File         13.636 byte
+
+ Directory di C:\Users\Asus\Desktop\vprj\flowe\normativa\templates\admin\domande
+
+09/08/2024  10:54    <DIR>          .
+09/08/2024  10:54    <DIR>          ..
+09/08/2024  10:54               292 change_list.html
+               1 File            292 byte
+
+ Directory di C:\Users\Asus\Desktop\vprj\flowe\normativa\templates\normativa
+
+16/07/2024  07:51    <DIR>          .
+16/07/2024  07:51    <DIR>          ..
+08/07/2024  14:50             1.061 chat.html
+22/06/2024  17:49               536 document_list.html
+               2 File          1.597 byte
+
+     Totale file elencati:
+               9 File         15.525 byte
+              11 Directory  259.622.842.368 byte disponibili

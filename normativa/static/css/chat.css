@@ -1,0 +1,95 @@
+#chat-modal {
+    width: 600px;
+    height: 500px;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    display: none; /* Nasconde la finestra all'inizio */
+    z-index: 1000;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+    flex-direction: column;
+}
+
+/* Stile del titolo */
+#chat-title {
+    background-color: #002d72; /* Colore di sfondo blu */
+    color: #ffffff; /* Colore del testo bianco */
+    padding: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+#chat-area {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    max-height: calc(100% - 100px); /* Limita l'altezza massima per lasciare spazio all'input */
+}
+/* Il contenitore per gli input */
+#chat-input-area {
+    padding: 10px;
+    display: flex;
+    justify-content: space-between; /* Spazio tra i due pulsanti */
+    align-items: center;
+    border-top: 1px solid #ddd;
+    background-color: #f9f9f9;
+    position: relative;
+}
+
+/* Stile per il campo di input */
+#chat-input {
+    flex-grow: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    resize: none; /* Evita il ridimensionamento manuale */
+    overflow-y: hidden; /* Nasconde la scrollbar verticale */
+    margin-right: 10px; /* Spazio tra input e pulsanti */
+}
+
+/* Stile per il pulsante Esci */
+#exit-button {
+    background-color: #dc3545; /* Colore rosso */
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    width: 80px; /* Dimensioni fisse */
+    height: 35px; /* Dimensioni fisse */
+    text-align: center;
+}
+
+/* Stile base per il pulsante Salva (disabilitato inizialmente) */
+#save-button {
+    background-color: #ccc; /* Grigio per quando è disabilitato */
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: not-allowed; /* Cursore non disponibile */
+    font-size: 12px;
+    width: 80px; /* Dimensioni fisse */
+    height: 35px; /* Dimensioni fisse */
+    text-align: center;
+    display: block; /* Sempre visibile */
+}
+
+/* Quando il pulsante è abilitato */
+#save-button.enabled {
+    background-color: #28a745; /* Verde quando abilitato */
+    cursor: pointer;
+}
+
+/* Pulsante disabilitato */
+#save-button:disabled {
+    background-color: #ccc; /* Grigio quando disabilitato */
+    cursor: not-allowed;
+}

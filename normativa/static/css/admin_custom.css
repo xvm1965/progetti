@@ -1,0 +1,11 @@
+.custom-link {
+    font-size: 10px; /* Riduce la dimensione del testo */
+    padding: 2px 5px; /* Riduce il padding */
+    margin: 0; /* Rimuove i margini */
+}
+
+
+.empty-label {
+    display: none; /* Nasconde completamente le etichette vuote */
+}
+

@@ -1,0 +1,15 @@
+<!-- In yourapp/templates/yourapp/document_list.html -->
+{% extends 'base.html' %}
+
+{% block title %}Elenco Documenti{% endblock %}
+
+{% block content %}
+    <h1>Document List</h1>
+    <ul>
+        {% for document in documents %}
+            <!-- <li>{{ document.file_name }} - <a href="{% url 'download_document' document.id %}">Download</a></li> -->
+            <li>{{ document.file_name }} - <a href="{% url 'normativa:download_document' document.id %}">Download</a></li>
+
+        {% endfor %}
+    </ul>
+{% endblock %}

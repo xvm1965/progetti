@@ -1,0 +1,61 @@
+{% extends "admin/change_list.html" %}
+
+{% load static %}
+
+{% block extrahead %}
+    {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    {{ block.super }}
+    
+    <!-- Elemento nascosto per passare l'id del dataset nella cache -->
+    <script type="application/json" id="chat_dataset">
+        {{ request.session.chat_dataset_key|safe }}
+    </script>
+    
+    <!-- Elemento nascosto per passare lo stato della modale -->
+    {% if request.session.show_modal %}
+        <div id="show_modal" data-show-modal="true"></div>
+    {% else %}
+        <div id="show_modal" data-show-modal="false"></div>
+    {% endif %}
+
+    <!-- Include the chat modal template -->
+    {% include "admin/chat_modal.html" %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const showModalElement = document.getElementById('show_modal');
+            const openChatModalParam = showModalElement ? showModalElement.getAttribute('data-show-modal') : 'false';
+
+            if (openChatModalParam === 'true') {
+                const datasetKeyElement = document.getElementById('chat_dataset');
+                const datasetKey = datasetKeyElement ? datasetKeyElement.textContent.trim() : null;
+                console.log("Dataset Key ricevuto: " + datasetKey);
+
+                // Apri la modale usando openChatModal, che è definita in chat.js
+                openChatModal(datasetKey);
+
+                // Dopo l'apertura della modale, invia una richiesta al server per aggiornare request.session.show_modal
+                fetch('{% url "normativa:reset_modal_session" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                    body: JSON.stringify({ show_modal: false })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating session:', error);
+                });
+            }
+        });
+
+    </script>
+{% endblock %}

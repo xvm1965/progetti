@@ -1,0 +1,37 @@
+ Il volume nell'unit… C non ha etichetta.
+ Numero di serie del volume: E8C0-7979
+
+ Directory di C:\Users\Asus\.cache\huggingface\hub
+
+05/08/2024  12:36    <DIR>          .
+05/08/2024  12:36    <DIR>          ..
+05/08/2024  12:36    <DIR>          .locks
+01/08/2024  09:14    <DIR>          models--anakin87--electra-italian-xxl-cased-squad-it
+27/07/2024  19:02    <DIR>          models--anakin87--zephyr-7b-alpha-sharded
+01/08/2024  09:15    <DIR>          models--antoniocappiello--bert-base-italian-uncased-squad-it
+03/07/2024  16:03    <DIR>          models--bert-base-uncased
+22/06/2024  23:10    <DIR>          models--bert-large-uncased-whole-word-masking-finetuned-squad
+05/08/2024  12:38    <DIR>          models--dbmdz--bert-base-italian-cased
+06/07/2024  13:02    <DIR>          models--dbmdz--bert-base-italian-uncased
+02/07/2024  10:58    <DIR>          models--distilbert-base-uncased-distilled-squad
+30/07/2024  23:30    <DIR>          models--distilgpt2
+12/07/2024  19:00    <DIR>          models--google--mt5-small
+02/08/2024  12:05    <DIR>          models--gsarti--it5-base-question-generation
+04/07/2024  17:05    <DIR>          models--Helsinki-NLP--opus-mt-en-it
+04/07/2024  17:03    <DIR>          models--Helsinki-NLP--opus-mt-it-en
+31/07/2024  22:38    <DIR>          models--it5--it5-small-question-answering
+01/08/2024  09:16    <DIR>          models--mrm8488--bert-italian-finedtuned-squadv1-it-alfa
+06/07/2024  09:27    <DIR>          models--mrm8488--bert-small-finetuned-squadv2
+01/08/2024  09:17    <DIR>          models--mrm8488--umberto-wikipedia-uncased-v1-finetuned-squadv1-it
+27/07/2024  20:21    <DIR>          models--Musixmatch--umberto-commoncrawl-cased-v1
+02/08/2024  14:38    <DIR>          models--osiria--deberta-italian-question-answering
+30/07/2024  23:52    <DIR>          models--sentence-transformers--all-mpnet-base-v2
+29/07/2024  18:35    <DIR>          models--sentence-transformers--distiluse-base-multilingual-cased
+01/08/2024  09:23    <DIR>          models--sentence-transformers--paraphrase-multilingual-MiniLM-L12-v2
+31/07/2024  20:23    <DIR>          models--timpal0l--mdeberta-v3-base-squad2
+27/07/2024  19:50    <DIR>          models--Trelis--Llama-2-7b-chat-hf-sharded-bf16
+10/07/2024  15:17    <DIR>          models--valhalla--t5-base-qg-hl
+11/07/2024  22:20    <DIR>          models--valhalla--t5-small-qa-qg-hl
+22/06/2024  15:20                 1 version.txt
+               1 File              1 byte
+              29 Directory  257.136.717.824 byte disponibili
