@@ -90,72 +90,68 @@ def extract_text_from_pdf(file):
     
     return text
 
-def split_text_into_sentences(text):
-    sentences = text.split('. ')  # Dividi il testo sulle frasi basate su punto e spazio
-    return [s.strip() for s in sentences if s.strip()]  # Rimuovi spazi vuoti e frasi vuote
+def pack_sentences (sentences, avg, model, distance_function, max_words, min_words=30):
+  # ripete il loop e unisce le frasi che sono più vicine della media geometrica       
+  j=0
+  current_part=[]
+  parts=[]
+  current_word_count=0
+  while j < len (sentences):
+    cur_word_count=word_count(sentences[j])
+    if (current_word_count + cur_word_count) > max_words:
+      # separa le due frasi perchè avrebbero una lunghezza superiore al limite
+      parts.append(' '.join(current_part))
+      current_part=[]
+      current_word_count=0
+    else:
+      if current_part:
+        # calcola gli embeddings
+        cur_part_embedding=model.encode(' '.join(current_part))
+        next_part_embedding=model.encode(sentences[j])
+        distance=np.linalg.norm(cur_part_embedding - next_part_embedding)
+        
+        if distance < avg:  
+          # la distanza tra le due frasi è minore della media, unisce le due frasi
+          current_part.append(sentences[j])
+          current_word_count+=cur_word_count
+        else:
+          # la distanza tra le due frasi è maggiore o uguale alla media, separa le due frasi
+          parts.append(' '.join(current_part))
+          current_part=[]
+          current_word_count=0
+      else:
+        # inizializza current_part
+        current_part.append(sentences[j])
+        current_word_count=cur_word_count
+    j+=1
+  # Aggiungi l'ultima parte (se esiste)
+  if current_part:
+    parts.append(' '.join(current_part))
+  parts = [s for s in parts if word_count(s)>min_words] #elimnina le parti pià corte di min word
+  return parts
+
+
+def pack_sentences_by_distance(text, max_words=128):
+  model = SentenceTransformer('efederici/sentence-IT5-base')
+  sentences = nltk.sent_tokenize(text)
+  embeddings=model.encode(sentences)
+  max=float('-inf')
+  min=float('inf')
+  avg=0
+  for j in range (len (sentences)-1):
+    distance = np.linalg.norm(embeddings[j] - embeddings[j+1])
+    avg+=distance
+  avg/=(len(embeddings))
+  parts = pack_sentences(sentences, avg, model, np_dist, max_words, min_words=30) # Pass np_distance as the function
+  return parts
+
 
 def load_and_chunk_file(file, chunk_size, tokenizer, nlp_pipeline):
     chunks=[]
     if file.endswith((".pdf", ".doc", ".docx")):
         text = normalizza_testo(estrai_testo_da_file(file))
-        sentences = split_text_into_sentences(text)
-        current_chunk = []
-        current_chunk_token_count = 0
-        current_embedding = None
-        for sentence in sentences:
-            # Tokenizza la frase e ottieni la lunghezza in token
-            sentence_tokens = tokenizer.encode(sentence, add_special_tokens=False) 
-            sentence_token_count = len(sentence_tokens)
-
-            # Controllo per suddividere la frase se è più lunga di chunk_size
-            if sentence_token_count > chunk_size:
-            # Se il chunk corrente ha già delle frasi, lo aggiungiamo a 'chunks' prima di gestire la frase lunga
-                if current_chunk:
-                    chunks.append(' '.join(current_chunk)) #aggiunge il chubnk corrente all'elenco dei chunk
-                    current_chunk = []                     #inizializza un nuovo chunk corrente
-                    current_chunk_token_count = 0          #azzera il contatore dei token del chunk corrente
-                
-                # Suddividi la frase in chunk più piccoli
-                for i in range(0, sentence_token_count, chunk_size):   #calcola la dimensione del blocco della frase corrente da inseire nel nuovo chunk
-                    sub_tokens = sentence_tokens[i:i + chunk_size]     #copia i token del blocco in sub tokens
-                    sub_sentence = tokenizer.decode(sub_tokens, skip_special_tokens=True) #trasforma il blocco di token in stringa
-                    chunks.append(sub_sentence)  # Aggiungi ogni sottosegmento come un chunk separato
-
-                # Vai alla prossima frase, senza fare ulteriori controlli su questa
-                continue
-
-            # Ottieni l'embedding per la frase
-            sentence_embedding = torch.tensor(nlp_pipeline(sentence)[0])
-
-            # Controlla se la frase si adatta nel chunk corrente o se deve iniziarne uno nuovo
-            if current_chunk_token_count + sentence_token_count > chunk_size or (                       #se la dimensione del chunk corrente + quella della frase è maggiore del massimo
-                current_embedding is not None and                                                       #oppure se l'emebdding del chunk corrente non è vuoto e
-                torch.cosine_similarity(current_embedding.mean(dim=0).unsqueeze(0), sentence_embedding.mean(dim=0).unsqueeze(0)).item() < 0.75 #la distanza coseno tra chunk corrente e nuova frase è < 0.75
-            ):
-                # Salva il chunk corrente
-                if current_chunk:
-                    chunks.append(' '.join(current_chunk))
-
-                current_chunk = [sentence] #inizializza un nuovo chunk corrente con la frase
-                current_chunk_token_count = sentence_token_count #inizializza il contatore dei token del chunk corrente
-                current_embedding = sentence_embedding  # Imposta l'embedding della nuova frase
-            else:
-                # il chunk corrente e la frase corrente hanno features simili: aggiunge la frase al chunk corrente
-                current_chunk.append(sentence) #aggiunge la frase al chunk corrente
-                current_chunk_token_count += sentence_token_count #incrementa il contatore di numero di token
-                
-                # Se current_embedding è None (quindi è la prima iterazione), assegniamo direttamente sentence_embedding
-                if current_embedding is None:
-                    current_embedding = sentence_embedding
-                else:
-                    # Altrimenti concateniamo gli embedding
-                    current_embedding = torch.cat((current_embedding, sentence_embedding), dim=0)
-
-        # Aggiungi l'ultimo chunk se esiste
-        if current_chunk:
-            chunks.append(' '.join(current_chunk))
-
-        return chunks
+        chunks=pack_sentences_by_distance(text, max_words=128)
+    return chunks
 
 
 def convert_seconds(seconds):
@@ -424,72 +420,36 @@ def replace_separators(text):
     text = replace_different_sequences_with_space(text)
     return text
 
-
-def normalizza_testo(testo=None):
-    # print ("normalizza testo ....")
-    if testo is None or not isinstance(testo, str):
-        return ""
-    try:
-
-        # print (f"elimina gli spazi inutili , da {len(testo)} caratteri a ", end=" ")
-        testo = re.sub(r'\s+', ' ', testo).strip()
-        # print (f"{len(testo) } caratteri")
-
-        # print (f"elimina i separatori , da {len(testo)} caratteri a ", end=" ")
-        testo=replace_separators (testo)
-        # print (f"{len(testo) } caratteri")
-        
-        #tutto minuscolo
-        testo = testo.lower()
-        
-        # print (f"elimina il sommario, da {len(testo)} caratteri a ", end=" ")
-        testo = togli_sommario(testo)
-        # print (f"{len(testo) } caratteri")
-
-       
-        
-        # print (f"elimina le stopwords da {len(testo)} caratteri a ", end=" ")
-        if REMOVE_STOPWORDS:
-            testo = ' '.join([word for word in testo.split() if word not in it_stopwords])
-        # print (f"{len(testo) } caratteri")
- 
-        # print (f"elimina la punteggiatura , da {len(testo)} caratteri a ", end=" ")
-        if REMOVE_PUNCTUATION:
-            #testo = re.sub(r'[^\w\s]', '', testo)
-            # Crea una stringa di pattern dai separatori per sequenze uguali
-            # Funzione principale che combina le due sostituzioni
+def normalizza_testo (text_None):
+    t=[]
+    l=len(text)
+    first_char=True
+    numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+    punctuation = ['.', ';', ',', ':']
+    special_chars = [' ', '[', ']', '(', ')', '{', '}', '.', ',', ';', ':', '!', '?', '-', '+', '=', '*', '_', '%', '$', '@', '#', '&', '"', "'", '\\', '/', '<', '>', '\n', '\t']
+    i=0
+    while i < l:
+        if text[i] in numbers and first_char:
+            # il periodo comincia con un numero si tratta di un titolo o dell'indice procede sino al prossimo CR
+            while i < l and text[i] != '\n': i+=1
+        else:
+            # non è all'inizio del paragrafo e non comincia con un numero
             
+            if not (text[i] in special_chars) or (t and ((t[-1] not in special_chars) or 
+                                                         (text[i] in [' ','\n'] and t[-1] in punctuation) or
+                                                         (text[i]=='\n' and t[-1]!='\n'))):
+                # il carattere corrente è un carattere ordinario oppure
+                # il carattere precedente non era un carattere speciale oppure era un segno di punteggiatura ed il carattere corrente è uno spazio 
+                t.append(text[i])
+                    
+            first_char=(text[i]=='\n')
+        i+=1
+    return ''.join(t)
 
-            # pattern = '[' + re.escape(''.join(SEPARATORS)) + ']+'
-            # testo = re.sub(pattern, ' ', testo)
-            pass
-        # print (f"{len(testo) } caratteri")
-        
-       
 
-        #testo = ''.join(c for c in unicodedata.normalize('NFD', testo) if unicodedata.category(c) != 'Mn')
-        if EXPAND_CONTRACTIONS:
-            testo = expand_contractions(testo)
-        # print (f"elimina i numeri , da {len(testo)} caratteri a ", end=" ")
-        if REMOVE_NUMBERS:
-            testo = remove_numbers(testo)
-        # print (f"{len(testo) } caratteri")
-        # print (f"elimina i caratteri speciali, da {len(testo)} caratteri a ", end=" ")
-        if REMOVE_SPECIAL_CHARACTERS:
-            testo = remove_special_characters(testo)
-        # print (f"{len(testo) } caratteri")
-        # print (f"elimina urls, da {len(testo)} caratteri a ", end=" ")
-        testo = remove_urls_emails(testo)
-        # print (f"{len(testo) } caratteri")
-        if SPELL_CORRECTION:
-            testo = correct_spelling(testo)
-        # print (f"elimina html, da {len(testo)} caratteri a ", end=" ")
-        testo = remove_html(testo)
-        # print (f"{len(testo) } caratteri")
-        if LEMMATIZER: testo = lemmatizza(testo)
-    except Exception as e:
-        print(f"Errore nella normalizzazione del testo: {e}")
-    return testo
+import re
+
+
 
 
 
