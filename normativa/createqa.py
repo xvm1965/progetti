@@ -84,12 +84,7 @@ def createqas(request, document_ids=None):
     ag_pipeline = pipeline("question-answering", model=ag_model, tokenizer=ag_tokenizer)
 
     ag_generative_model, ag_generative_tokenizer=load_generative_agmodel() ## inizializza checkpoint e tokenizer del generatore di risposte con il modello generativo
-        
-    def get_max_num_tokens (s):
-        return max (len(qg_tokenizer.encode(chunk_text, add_special_tokens=False)), 
-                    len(ag_tokenizer.encode(chunk_text, add_special_tokens=False)),
-                    len(ag_generative_tokenizer.encode(chunk_text, add_special_tokens=False)))
-
+  
     # definisce le dimensioni del blocco di testo
     chunk_size = 512
     
@@ -110,12 +105,12 @@ def createqas(request, document_ids=None):
             """
             words = chunk_text.split()   # suddivide il testo in parole
             num_words = len (words)      # numero di parole
-            num_tokens = get_max_num_tokens (chunk_text) # calcola il massimo numero di token
+            num_tokens = 512 (chunk_text) # calcola il massimo numero di token
             
             while num_tokens > chunk_size: # sino a che il numero di token è maggiore di chunk_size
                 num_words -=1 
                 chunk_text =  ' '.join(words[:num_words])  # elimina l'ultima parola
-                num_tokens = get_max_num_tokens (chunk_text) # calcola il massimo numero di token
+                num_tokens = 512 (chunk_text) # calcola il massimo numero di token
 
             chunk_questions = generate_questions(qg_pipeline, chunk_text, qg_params)   #genera le domande                     
            
